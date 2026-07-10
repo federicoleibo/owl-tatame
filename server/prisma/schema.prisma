@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Role/Weekday/BookingType/BookingStatus are plain Strings (kept as strings,
+// not Prisma enums, since the project started on SQLite which has no native
+// enum support); valid values are enforced in app code (see
+// src/utils/constants.ts) and validated at the API boundary with zod.
+
+model User {
+  id           Int       @id @default(autoincrement())
+  dni          String    @unique
+  passwordHash String
+  fullName     String
+  phone        String?
+  role         String    @default("SOCIO")
+  createdAt    DateTime  @default(now())
+  bookings     Booking[]
+  checkIns     CheckIn[]
+}
+
+model Activity {
+  id    Int         @id @default(autoincrement())
+  name  String      @unique
+  slots ClassSlot[]
+}
+
+// groupId links ClassSlots that represent the same "horario" (e.g. Musculacion 18:00)
+// offered across several weekdays, so a single weekly booking action can target
+// all of them.
+model ClassSlot {
+  id         Int       @id @default(autoincrement())
+  activityId Int
+  activity   Activity  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  groupId    String
+  weekday    String
+  startTime  String
+  endTime    String
+  capacity   Int       @default(20)
+  bookings   Booking[]
+
+  @@index([activityId, weekday])
+  @@index([groupId])
+}
+
+model Booking {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classSlotId Int
+  classSlot   ClassSlot @relation(fields: [classSlotId], references: [id], onDelete: Cascade)
+  date        DateTime
+  type        String
+  weekGroupId String?
+  status      String   @default("CONFIRMADA")
+  createdAt   DateTime @default(now())
+
+  @@unique([classSlotId, date, userId])
+  @@index([userId, date])
+}
+
+model CheckIn {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timestamp DateTime @default(now())
+
+  @@index([userId, timestamp])
+}
+
+// Short notices shown on the login/register screen (e.g. holiday closures).
+model Announcement {
+  id        Int      @id @default(autoincrement())
+  message   String
+  imageUrl  String?
+  createdAt DateTime @default(now())
+}

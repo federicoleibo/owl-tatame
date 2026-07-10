@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-background: 11 11 12;
+  --color-foreground: 248 248 247;
+  --color-surface: 26 26 29;
+  --color-surface-alt: 37 37 41;
+  --color-primary: 228 36 31;
+  --color-on-primary: 255 255 255;
+  --color-muted: 156 156 163;
+  --color-border: 58 58 63;
+  --color-destructive: 239 68 68;
+  --color-success: 34 197 94;
+}
+
+:root[data-theme="light"] {
+  --color-background: 250 250 249;
+  --color-foreground: 20 20 20;
+  --color-surface: 255 255 255;
+  --color-surface-alt: 241 241 240;
+  --color-primary: 228 36 31;
+  --color-on-primary: 255 255 255;
+  --color-muted: 100 100 105;
+  --color-border: 224 224 222;
+  --color-destructive: 220 38 38;
+  --color-success: 22 163 74;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply bg-background text-foreground font-body;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  @apply font-display tracking-wide;
+}

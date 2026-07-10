@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.env.local
+*.db
+*.db-journal
+uploads/announcements/*
+!uploads/announcements/.gitkeep
+.DS_Store
+*.tsbuildinfo
