@@ -19,7 +19,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-0 sm:p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-0 sm:p-4 animate-fade-in"
       onClick={onClose}
     >
       <div
@@ -27,7 +27,7 @@ export function Modal({
         aria-modal="true"
         aria-labelledby="modal-title"
         onClick={(e) => e.stopPropagation()}
-        className="w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl border border-border bg-surface p-5 animate-in"
+        className="w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl border border-border bg-surface p-5 animate-slide-up sm:animate-scale-in"
       >
         <div className="flex items-center justify-between mb-4">
           <h2 id="modal-title" className="font-display text-xl font-bold">

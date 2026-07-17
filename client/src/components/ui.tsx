@@ -6,7 +6,7 @@ export function Button({
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "danger" | "ghost" }) {
   const base =
-    "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold tracking-wide transition-colors duration-200 min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
+    "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold tracking-wide transition-all duration-150 min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
   const variants: Record<string, string> = {
     primary: "bg-primary text-on-primary hover:bg-primary/90 active:bg-primary/80",
     secondary: "bg-surface-alt text-foreground border border-border hover:bg-surface-alt/70",
