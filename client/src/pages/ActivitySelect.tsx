@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { Activity } from "../api/types";
-import { DumbbellIcon, KettlebellIcon } from "../components/ActivityIcons";
+import { BeltIcon, DumbbellIcon, KettlebellIcon } from "../components/ActivityIcons";
 
 const ACTIVITY_META: Record<string, { icon: (size: number) => JSX.Element; blurb: string }> = {
   musculacion: {
@@ -12,6 +12,10 @@ const ACTIVITY_META: Record<string, { icon: (size: number) => JSX.Element; blurb
   crossfuncional: {
     icon: (size) => <KettlebellIcon size={size} />,
     blurb: "Clases grupales de alta intensidad y trabajo funcional.",
+  },
+  jiujitsu: {
+    icon: (size) => <BeltIcon size={size} />,
+    blurb: "Tecnica, guardia y trabajo de piso en cada clase.",
   },
 };
 

@@ -18,12 +18,20 @@ function buildSlots(startHour: number, endHour: number, durationMinutes: number)
   return slots;
 }
 
+// Ensures a default activity exists without touching anything else. Runs on
+// every deploy (even against an already-seeded DB) so new default activities
+// can be introduced later without wiping real data.
+async function ensureActivity(name: string) {
+  await prisma.activity.upsert({ where: { name }, update: {}, create: { name } });
+}
+
 async function main() {
   // Safe to run on every deploy: only seeds once. Prevents wiping real data
   // (bookings, custom schedules, new members) on subsequent redeploys.
   const existingActivities = await prisma.activity.count();
   if (existingActivities > 0) {
     console.log("Seed omitido: ya hay datos cargados.");
+    await ensureActivity("Jiu-Jitsu");
     return;
   }
 
@@ -77,6 +85,8 @@ async function main() {
   await prisma.announcement.create({
     data: { message: "¡Bienvenidos a OWL TATAME! Anotate con anticipacion para asegurar tu lugar en cada clase." },
   });
+
+  await ensureActivity("Jiu-Jitsu");
 
   console.log("Seed completado.");
   console.log("Admin -> DNI: 00000000 / Contrasena: admin123");

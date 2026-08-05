@@ -11,6 +11,21 @@ import { announcementImageUrl, deleteAnnouncementImage, uploadAnnouncementImage 
 const router = Router();
 router.use(requireAuth, requireAdmin);
 
+// ---- Activity management ----
+
+const activitySchema = z.object({ name: z.string().trim().min(2).max(40) });
+
+router.post("/activities", async (req, res) => {
+  const parsed = activitySchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "Ingresa un nombre de actividad valido" });
+
+  const exists = await prisma.activity.findUnique({ where: { name: parsed.data.name } });
+  if (exists) return res.status(409).json({ error: "Ya existe una actividad con ese nombre" });
+
+  const activity = await prisma.activity.create({ data: { name: parsed.data.name } });
+  res.status(201).json(activity);
+});
+
 // ---- Schedule management ----
 
 router.get("/schedule", async (_req, res) => {

@@ -53,6 +53,11 @@ export function ActivityCalendar() {
   const [bookingType, setBookingType] = useState<BookingType>("DIARIA");
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ tone: "success" | "error"; message: string } | null>(null);
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+
+  useEffect(() => {
+    setSelectedDayIndex(0);
+  }, [activityId]);
 
   async function load() {
     setLoading(true);
@@ -75,6 +80,12 @@ export function ActivityCalendar() {
     days.forEach((d) => d.slots.forEach((s) => set.add(s.startTime)));
     return Array.from(set).sort();
   }, [days]);
+
+  const selectedDay = days[selectedDayIndex];
+  const selectedDaySlots = useMemo(() => {
+    if (!selectedDay) return [];
+    return [...selectedDay.slots].sort((a, b) => a.startTime.localeCompare(b.startTime));
+  }, [selectedDay]);
 
   function openSlot(slot: ScheduleSlot, day: ScheduleDay) {
     if (!slot.bookable) return;
@@ -150,55 +161,113 @@ export function ActivityCalendar() {
       {loading && <p className="text-muted">Cargando horarios...</p>}
 
       {!loading && (
-        <div className="overflow-x-auto pb-2">
-          <div
-            className="grid gap-1.5"
-            style={{ gridTemplateColumns: `72px repeat(${days.length}, minmax(84px, 1fr))`, minWidth: 72 + days.length * 88 }}
-          >
-            <div />
-            {days.map((day, idx) => (
-              <div key={day.date} className="text-center px-1 py-2">
-                <p className="text-sm font-bold">{dayHeaderLabel(day.weekday, idx)}</p>
-                <p className="text-xs text-muted">{formatShortDate(day.date)}</p>
-              </div>
-            ))}
+        <>
+          {/* Mobile: day chips + vertical slot list */}
+          <div className="sm:hidden">
+            <div className="flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 mb-1" style={{ scrollSnapType: "x proximity" }}>
+              {days.map((day, idx) => (
+                <button
+                  key={day.date}
+                  onClick={() => setSelectedDayIndex(idx)}
+                  style={{ scrollSnapAlign: "start" }}
+                  className={`shrink-0 flex flex-col items-center justify-center gap-0.5 rounded-xl min-w-[64px] min-h-[56px] px-3 py-2 text-sm font-semibold transition-colors duration-150 ${
+                    idx === selectedDayIndex
+                      ? "bg-primary text-on-primary"
+                      : "bg-surface-alt text-muted hover:text-foreground"
+                  }`}
+                >
+                  <span>{dayHeaderLabel(day.weekday, idx)}</span>
+                  <span className="text-xs font-normal opacity-80">{formatShortDate(day.date)}</span>
+                </button>
+              ))}
+            </div>
 
-            {times.map((time) => (
-              <Fragment key={time}>
-                <div className="flex items-center justify-end pr-2 text-sm font-semibold text-muted">
-                  {time}
-                </div>
-                {days.map((day) => {
-                  const slot = day.slots.find((s) => s.startTime === time);
-                  const state = cellState(slot);
-                  return (
-                    <button
-                      key={`${time}-${day.date}`}
-                      disabled={state !== "bookable"}
-                      onClick={() => slot && openSlot(slot, day)}
-                      title={
-                        slot
-                          ? `${slot.startTime}-${slot.endTime} · ${slot.spotsLeft}/${slot.capacity} cupos`
-                          : undefined
-                      }
-                      className={`min-h-[52px] rounded-md border text-xs font-semibold flex flex-col items-center justify-center gap-0.5 transition-colors ${CELL_STYLES[state]}`}
-                    >
+            <div key={selectedDayIndex} className="space-y-2 animate-fade-in">
+              {selectedDaySlots.length === 0 && (
+                <p className="text-muted text-sm py-8 text-center">No hay horarios este dia.</p>
+              )}
+              {selectedDaySlots.map((slot) => {
+                const state = cellState(slot);
+                return (
+                  <button
+                    key={slot.id}
+                    disabled={state !== "bookable"}
+                    onClick={() => selectedDay && openSlot(slot, selectedDay)}
+                    className={`w-full flex items-center justify-between gap-3 rounded-lg border min-h-[56px] px-4 py-3 text-left transition-colors duration-150 ${CELL_STYLES[state]}`}
+                  >
+                    <span className="font-semibold">
+                      {slot.startTime} - {slot.endTime}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-sm font-medium">
                       {state === "booked" && (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
+                        <>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                          Anotado
+                        </>
                       )}
-                      {state === "bookable" && <span>{slot!.spotsLeft} lug.</span>}
-                      {state === "full" && <span>Sin cupo</span>}
-                      {state === "closed" && <span>Cerrado</span>}
-                      {state === "none" && <span>—</span>}
-                    </button>
-                  );
-                })}
-              </Fragment>
-            ))}
+                      {state === "bookable" && `${slot.spotsLeft} lugares`}
+                      {state === "full" && "Sin cupo"}
+                      {state === "closed" && "Cerrado"}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+
+          {/* Desktop / tablet: full week grid */}
+          <div className="hidden sm:block overflow-x-auto pb-2">
+            <div
+              className="grid gap-1.5"
+              style={{ gridTemplateColumns: `72px repeat(${days.length}, minmax(84px, 1fr))`, minWidth: 72 + days.length * 88 }}
+            >
+              <div />
+              {days.map((day, idx) => (
+                <div key={day.date} className="text-center px-1 py-2">
+                  <p className="text-sm font-bold">{dayHeaderLabel(day.weekday, idx)}</p>
+                  <p className="text-xs text-muted">{formatShortDate(day.date)}</p>
+                </div>
+              ))}
+
+              {times.map((time) => (
+                <Fragment key={time}>
+                  <div className="flex items-center justify-end pr-2 text-sm font-semibold text-muted">
+                    {time}
+                  </div>
+                  {days.map((day) => {
+                    const slot = day.slots.find((s) => s.startTime === time);
+                    const state = cellState(slot);
+                    return (
+                      <button
+                        key={`${time}-${day.date}`}
+                        disabled={state !== "bookable"}
+                        onClick={() => slot && openSlot(slot, day)}
+                        title={
+                          slot
+                            ? `${slot.startTime}-${slot.endTime} · ${slot.spotsLeft}/${slot.capacity} cupos`
+                            : undefined
+                        }
+                        className={`min-h-[52px] rounded-md border text-xs font-semibold flex flex-col items-center justify-center gap-0.5 transition-colors ${CELL_STYLES[state]}`}
+                      >
+                        {state === "booked" && (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                        {state === "bookable" && <span>{slot!.spotsLeft} lug.</span>}
+                        {state === "full" && <span>Sin cupo</span>}
+                        {state === "closed" && <span>Cerrado</span>}
+                        {state === "none" && <span>—</span>}
+                      </button>
+                    );
+                  })}
+                </Fragment>
+              ))}
+            </div>
+          </div>
+        </>
       )}
 
       {selected && (

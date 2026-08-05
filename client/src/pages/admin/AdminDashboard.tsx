@@ -37,7 +37,7 @@ export function AdminDashboard() {
         <Link to="/admin/horarios">
           <Card className="hover:border-primary transition-colors cursor-pointer h-full">
             <p className="font-semibold mb-1">Gestionar horarios</p>
-            <p className="text-sm text-muted">Crea, edita o elimina turnos de Musculacion y CrossFuncional.</p>
+            <p className="text-sm text-muted">Crea, edita o elimina turnos por actividad.</p>
           </Card>
         </Link>
         <Link to="/admin/socios">

@@ -24,3 +24,13 @@ export function KettlebellIcon({ size = 64 }: { size?: number }) {
     </svg>
   );
 }
+
+export function BeltIcon({ size = 64 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" aria-hidden="true">
+      <rect x="4" y="26" width="56" height="8" rx="3" fill="currentColor" />
+      <rect x="23" y="17" width="18" height="26" rx="4" fill="currentColor" />
+      <path d="M27 43l-7 14M37 43l7 14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+    </svg>
+  );
+}

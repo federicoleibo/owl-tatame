@@ -3,6 +3,12 @@ import { api, ApiError } from "../../api/client";
 import { Activity, AdminScheduleGroup, Weekday } from "../../api/types";
 import { Badge, Button, Card, ErrorText, Input, Label } from "../../components/ui";
 
+const activityDotColors = ["bg-primary", "bg-success", "bg-blue-500", "bg-amber-500", "bg-purple-500"];
+
+function activityDot(activityId: number) {
+  return activityDotColors[activityId % activityDotColors.length];
+}
+
 const WEEKDAYS: { value: Weekday; label: string }[] = [
   { value: "LUN", label: "Lun" },
   { value: "MAR", label: "Mar" },
@@ -31,6 +37,10 @@ export function AdminSchedules() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [addingActivity, setAddingActivity] = useState(false);
+  const [newActivityName, setNewActivityName] = useState("");
+  const [activityError, setActivityError] = useState("");
+  const [creatingActivity, setCreatingActivity] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
 
   async function load() {
@@ -70,6 +80,23 @@ export function AdminSchedules() {
     });
     setEditingGroupId(group.groupId);
     setError("");
+  }
+
+  async function createActivity() {
+    if (!newActivityName.trim()) return;
+    setCreatingActivity(true);
+    setActivityError("");
+    try {
+      const created = await api<Activity>("/admin/activities", { method: "POST", body: { name: newActivityName.trim() } });
+      setActivities((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
+      setForm((f) => ({ ...f, activityId: created.id }));
+      setNewActivityName("");
+      setAddingActivity(false);
+    } catch (err) {
+      setActivityError(err instanceof ApiError ? err.message : "No se pudo crear la actividad");
+    } finally {
+      setCreatingActivity(false);
+    }
   }
 
   function toggleWeekday(day: Weekday) {
@@ -116,19 +143,52 @@ export function AdminSchedules() {
           <form onSubmit={handleSubmit}>
           <div className="grid gap-4 sm:grid-cols-2 mb-4">
             <div>
-              <Label htmlFor="activity">Actividad</Label>
-              <select
-                id="activity"
-                className="w-full min-h-[44px] rounded-md border border-border bg-surface px-3 text-foreground"
-                value={form.activityId}
-                onChange={(e) => setForm((f) => ({ ...f, activityId: Number(e.target.value) }))}
-              >
-                {activities.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.name}
-                  </option>
-                ))}
-              </select>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="activity">Actividad</Label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddingActivity((a) => !a);
+                    setActivityError("");
+                  }}
+                  className="text-xs font-semibold text-primary hover:underline cursor-pointer"
+                >
+                  {addingActivity ? "Cancelar" : "+ Nueva actividad"}
+                </button>
+              </div>
+              {addingActivity ? (
+                <div className="flex gap-2">
+                  <Input
+                    autoFocus
+                    placeholder="Ej: Jiu-Jitsu"
+                    value={newActivityName}
+                    onChange={(e) => setNewActivityName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        createActivity();
+                      }
+                    }}
+                  />
+                  <Button type="button" onClick={createActivity} disabled={creatingActivity} className="shrink-0">
+                    {creatingActivity ? "..." : "Agregar"}
+                  </Button>
+                </div>
+              ) : (
+                <select
+                  id="activity"
+                  className="w-full min-h-[44px] rounded-md border border-border bg-surface px-3 text-foreground"
+                  value={form.activityId}
+                  onChange={(e) => setForm((f) => ({ ...f, activityId: Number(e.target.value) }))}
+                >
+                  {activities.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <ErrorText>{activityError}</ErrorText>
             </div>
             <div>
               <Label htmlFor="capacity">Cupo maximo</Label>
@@ -194,7 +254,7 @@ export function AdminSchedules() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display text-3xl font-bold mb-1">Horarios</h1>
-          <p className="text-muted text-sm">Turnos de Musculacion y CrossFuncional.</p>
+          <p className="text-muted text-sm">Turnos por actividad, editables como prefieras.</p>
         </div>
         <Button onClick={startCreate}>+ Nuevo horario</Button>
       </div>
@@ -208,7 +268,8 @@ export function AdminSchedules() {
           <div key={g.groupId}>
             <Card className="flex items-center justify-between gap-4 flex-wrap">
               <div>
-                <p className="font-semibold">
+                <p className="font-semibold flex items-center gap-2">
+                  <span className={`inline-block w-2.5 h-2.5 rounded-full shrink-0 ${activityDot(g.activityId)}`} />
                   {g.activityName} · {g.startTime} - {g.endTime}
                 </p>
                 <div className="flex gap-1.5 mt-1.5 flex-wrap">
