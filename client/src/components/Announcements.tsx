@@ -21,7 +21,7 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
   );
 }
 
-export function Announcements() {
+export function Announcements({ className = "w-full max-w-sm mt-6" }: { className?: string }) {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export function Announcements() {
   if (announcements.length === 0) return null;
 
   return (
-    <div className="w-full max-w-sm mt-6">
+    <div className={className}>
       <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-2">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path

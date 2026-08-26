@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { Activity } from "../api/types";
 import { BeltIcon, DumbbellIcon, KettlebellIcon } from "../components/ActivityIcons";
+import { Announcements } from "../components/Announcements";
 
 const ACTIVITY_META: Record<string, { icon: (size: number) => JSX.Element; blurb: string }> = {
   musculacion: {
@@ -37,6 +38,8 @@ export function ActivitySelect() {
 
   return (
     <div>
+      <Announcements className="w-full mb-6" />
+
       <h1 className="font-display text-3xl font-bold mb-1">¿A que actividad te queres anotar?</h1>
       <p className="text-muted text-sm mb-6">Elegi una actividad para ver los horarios disponibles.</p>
 
