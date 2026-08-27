@@ -2,6 +2,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { Logo } from "./Logo";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "./ui";
+import { InstallPrompt } from "./InstallPrompt";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `relative rounded-md px-2.5 py-2 text-sm font-semibold transition-colors duration-150 after:absolute after:left-2.5 after:right-2.5 after:-bottom-[1px] after:h-0.5 after:origin-left after:scale-x-0 after:bg-primary after:transition-transform after:duration-200 sm:px-3 ${
@@ -38,6 +39,7 @@ export function MemberShell() {
         </div>
       </header>
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6 animate-fade-in">
+        <InstallPrompt />
         <Outlet />
       </main>
     </div>
