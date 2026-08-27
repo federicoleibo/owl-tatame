@@ -5,6 +5,7 @@ import multer from "multer";
 
 export const UPLOADS_DIR = path.join(__dirname, "..", "..", "uploads");
 const ANNOUNCEMENTS_DIR = path.join(UPLOADS_DIR, "announcements");
+fs.mkdirSync(ANNOUNCEMENTS_DIR, { recursive: true });
 
 const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
