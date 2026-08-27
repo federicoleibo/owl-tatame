@@ -36,8 +36,9 @@ app.get(/.*/, (req, res, next) => {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  res.status(400).json({ error: err.message || "Ocurrio un error inesperado" });
+app.use((err: Error & { code?: string }, _req: Request, res: Response, _next: NextFunction) => {
+  const message = err.code === "LIMIT_FILE_SIZE" ? "La imagen es demasiado pesada (maximo 20MB)" : err.message;
+  res.status(400).json({ error: message || "Ocurrio un error inesperado" });
 });
 
 const port = Number(process.env.PORT) || 4000;

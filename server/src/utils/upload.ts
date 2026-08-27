@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
 
 export const uploadAnnouncementImage = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 20 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
       cb(new Error("Formato de imagen no soportado (usa JPG, PNG, WEBP o GIF)"));

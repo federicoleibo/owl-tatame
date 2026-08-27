@@ -4,7 +4,6 @@ import { useAuth } from "../context/AuthContext";
 import { ApiError } from "../api/client";
 import { Button, Card, ErrorText, Input, Label } from "../components/ui";
 import { Logo } from "../components/Logo";
-import { Announcements } from "../components/Announcements";
 
 export function Login() {
   const { login } = useAuth();
@@ -74,7 +73,6 @@ export function Login() {
           </Link>
         </p>
       </div>
-      <Announcements />
     </div>
   );
 }
