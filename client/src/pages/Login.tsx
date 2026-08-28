@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { ApiError } from "../api/client";
 import { Button, Card, ErrorText, Input, Label } from "../components/ui";
 import { Logo } from "../components/Logo";
+import { InstallPrompt } from "../components/InstallPrompt";
 
 export function Login() {
   const { login } = useAuth();
@@ -35,6 +36,7 @@ export function Login() {
           <h1 className="font-display text-3xl font-bold mt-2">OWL TATAME</h1>
           <p className="text-muted text-sm">Ingresa con tu DNI y contrasena</p>
         </div>
+        <InstallPrompt />
         <Card>
           <form onSubmit={handleSubmit} noValidate>
             <div className="mb-4">
