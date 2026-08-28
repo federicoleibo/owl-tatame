@@ -7,6 +7,12 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+declare global {
+  interface Window {
+    __deferredInstallPrompt?: BeforeInstallPromptEvent;
+  }
+}
+
 function isStandalone() {
   return (
     window.matchMedia("(display-mode: standalone)").matches ||
@@ -26,8 +32,13 @@ export function InstallPrompt() {
   useEffect(() => {
     if (isStandalone()) return;
 
+    // The event may have already fired (and been captured by the inline
+    // script in index.html) before this component ever mounted.
+    if (window.__deferredInstallPrompt) setDeferredPrompt(window.__deferredInstallPrompt);
+
     function onBeforeInstallPrompt(e: Event) {
       e.preventDefault();
+      window.__deferredInstallPrompt = e as BeforeInstallPromptEvent;
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     }
     window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
