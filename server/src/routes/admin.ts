@@ -158,7 +158,7 @@ const resetPasswordSchema = z.object({ password: z.string().min(6) });
 
 router.put("/members/:id/password", async (req, res) => {
   const parsed = resetPasswordSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: "La contrasena debe tener al menos 6 caracteres" });
+  if (!parsed.success) return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
 
   const id = Number(req.params.id);
   const member = await prisma.user.findUnique({ where: { id } });

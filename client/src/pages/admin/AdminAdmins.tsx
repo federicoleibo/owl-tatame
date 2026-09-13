@@ -95,7 +95,7 @@ export function AdminAdmins() {
                 />
               </div>
               <div>
-                <Label htmlFor="password">Contrasena inicial</Label>
+                <Label htmlFor="password">Contraseña inicial</Label>
                 <Input
                   id="password"
                   type="password"

@@ -89,8 +89,8 @@ async function main() {
   await ensureActivity("Jiu-Jitsu");
 
   console.log("Seed completado.");
-  console.log("Admin -> DNI: 00000000 / Contrasena: admin123");
-  console.log("Socio demo -> DNI: 30111222 / Contrasena: socio123");
+  console.log("Admin -> DNI: 00000000 / Contraseña: admin123");
+  console.log("Socio demo -> DNI: 30111222 / Contraseña: socio123");
 }
 
 main()

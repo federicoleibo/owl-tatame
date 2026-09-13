@@ -67,7 +67,7 @@ export function AdminMembers() {
       await api(`/admin/members/${resetTarget.id}/password`, { method: "PUT", body: { password: newPassword } });
       setResetTarget(null);
     } catch (err) {
-      setResetError(err instanceof ApiError ? err.message : "No se pudo restablecer la contrasena");
+      setResetError(err instanceof ApiError ? err.message : "No se pudo restablecer la contraseña");
     } finally {
       setResetting(false);
     }
@@ -120,7 +120,7 @@ export function AdminMembers() {
                 />
               </div>
               <div>
-                <Label htmlFor="password">Contrasena inicial</Label>
+                <Label htmlFor="password">Contraseña inicial</Label>
                 <Input
                   id="password"
                   type="password"
@@ -159,7 +159,7 @@ export function AdminMembers() {
             </div>
             <div className="flex gap-2">
               <Button variant="secondary" onClick={() => openReset(m)}>
-                Restablecer contrasena
+                Restablecer contraseña
               </Button>
               <Button variant="danger" onClick={() => remove(m.id)}>
                 Eliminar
@@ -170,10 +170,10 @@ export function AdminMembers() {
       </div>
 
       {resetTarget && (
-        <Modal title={`Restablecer contrasena de ${resetTarget.fullName}`} onClose={() => setResetTarget(null)}>
+        <Modal title={`Restablecer contraseña de ${resetTarget.fullName}`} onClose={() => setResetTarget(null)}>
           <form onSubmit={submitReset}>
             <div className="mb-4">
-              <Label htmlFor="newPassword">Contrasena nueva</Label>
+              <Label htmlFor="newPassword">Contraseña nueva</Label>
               <Input
                 id="newPassword"
                 type="text"

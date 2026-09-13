@@ -65,7 +65,7 @@ export function Login() {
         <div className="flex flex-col items-center mb-6">
           <Logo size={72} />
           <h1 className="font-display text-3xl font-bold mt-2">OWL TATAME</h1>
-          <p className="text-muted text-sm">Ingresa con tu DNI y contrasena</p>
+          <p className="text-muted text-sm">Ingresa con tu DNI y contraseña</p>
         </div>
         <InstallPrompt />
         <Card>
@@ -83,7 +83,7 @@ export function Login() {
               />
             </div>
             <div className="mb-2">
-              <Label htmlFor="password">Contrasena</Label>
+              <Label htmlFor="password">Contraseña</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -97,7 +97,7 @@ export function Login() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  aria-label={showPassword ? "Ocultar contrasena" : "Mostrar contrasena"}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                   className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md p-2 text-muted hover:text-foreground cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
                 >
                   <EyeIcon off={showPassword} />
@@ -108,7 +108,7 @@ export function Login() {
                 onClick={() => setShowForgot(true)}
                 className="mt-1.5 text-sm text-primary font-semibold hover:underline cursor-pointer"
               >
-                ¿Olvidaste tu contrasena?
+                ¿Olvidaste tu contraseña?
               </button>
             </div>
             <ErrorText>{error}</ErrorText>
@@ -118,10 +118,10 @@ export function Login() {
           </form>
         </Card>
         {showForgot && (
-          <Modal title="Recuperar contrasena" onClose={() => setShowForgot(false)}>
+          <Modal title="Recuperar contraseña" onClose={() => setShowForgot(false)}>
             <p className="text-sm text-foreground mb-4">
-              Por tu seguridad, el restablecimiento de contrasena lo hace un administrador del gimnasio.
-              Acercate a recepcion o contactalos para que te asignen una contrasena nueva.
+              Por tu seguridad, el restablecimiento de contraseña lo hace un administrador del gimnasio.
+              Acercate a recepcion o contactalos para que te asignen una contraseña nueva.
             </p>
             <Button variant="secondary" className="w-full" onClick={() => setShowForgot(false)}>
               Entendido

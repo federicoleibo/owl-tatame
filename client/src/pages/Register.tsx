@@ -59,7 +59,7 @@ export function Register() {
               <Input id="phone" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
             <div className="mb-2">
-              <Label htmlFor="password">Contrasena</Label>
+              <Label htmlFor="password">Contraseña</Label>
               <Input
                 id="password"
                 type="password"

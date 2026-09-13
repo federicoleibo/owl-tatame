@@ -9,7 +9,7 @@ const router = Router();
 
 const registerSchema = z.object({
   dni: z.string().trim().regex(/^\d{7,9}$/, "El DNI debe tener entre 7 y 9 numeros"),
-  password: z.string().min(6, "La contrasena debe tener al menos 6 caracteres"),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
   fullName: z.string().trim().min(2, "Ingresa tu nombre completo"),
   phone: z.string().trim().optional(),
 });
@@ -46,17 +46,17 @@ const loginSchema = z.object({
 router.post("/login", async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: "Ingresa DNI y contrasena" });
+    return res.status(400).json({ error: "Ingresa DNI y contraseña" });
   }
   const { dni, password } = parsed.data;
 
   const user = await prisma.user.findUnique({ where: { dni } });
   if (!user) {
-    return res.status(401).json({ error: "DNI o contrasena incorrectos" });
+    return res.status(401).json({ error: "DNI o contraseña incorrectos" });
   }
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
-    return res.status(401).json({ error: "DNI o contrasena incorrectos" });
+    return res.status(401).json({ error: "DNI o contraseña incorrectos" });
   }
 
   const token = signToken({ userId: user.id, role: user.role as "SOCIO" | "ADMIN" });
