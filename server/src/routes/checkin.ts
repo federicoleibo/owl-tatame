@@ -15,6 +15,9 @@ router.post("/checkin", async (req, res) => {
 
   const user = await prisma.user.findUnique({ where: { dni: parsed.data.dni } });
   if (!user) return res.status(404).json({ error: "No encontramos un socio con ese DNI" });
+  if (!user.active) {
+    return res.status(403).json({ error: "No podes ingresar: tenes la cuota mensual pendiente de pago." });
+  }
 
   await prisma.checkIn.create({ data: { userId: user.id } });
 

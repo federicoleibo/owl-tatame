@@ -122,7 +122,16 @@ router.get("/members", async (_req, res) => {
     where: { role: "SOCIO" },
     orderBy: { fullName: "asc" },
   });
-  res.json(members.map((m) => ({ id: m.id, dni: m.dni, fullName: m.fullName, phone: m.phone, createdAt: m.createdAt })));
+  res.json(
+    members.map((m) => ({
+      id: m.id,
+      dni: m.dni,
+      fullName: m.fullName,
+      phone: m.phone,
+      active: m.active,
+      createdAt: m.createdAt,
+    }))
+  );
 });
 
 const createMemberSchema = z.object({
@@ -151,6 +160,20 @@ router.delete("/members/:id", async (req, res) => {
     return res.status(400).json({ error: "No podes eliminar tu propio usuario" });
   }
   await prisma.user.delete({ where: { id } });
+  res.json({ ok: true });
+});
+
+const memberStatusSchema = z.object({ active: z.boolean() });
+
+router.put("/members/:id/status", async (req, res) => {
+  const parsed = memberStatusSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "Datos invalidos" });
+
+  const id = Number(req.params.id);
+  const member = await prisma.user.findUnique({ where: { id } });
+  if (!member || member.role !== "SOCIO") return res.status(404).json({ error: "Socio no encontrado" });
+
+  await prisma.user.update({ where: { id }, data: { active: parsed.data.active } });
   res.json({ ok: true });
 });
 

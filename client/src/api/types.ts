@@ -7,6 +7,7 @@ export interface AuthUser {
   dni: string;
   fullName: string;
   role: Role;
+  active: boolean;
 }
 
 export interface Activity {
@@ -59,6 +60,7 @@ export interface AdminMember {
   dni: string;
   fullName: string;
   phone: string | null;
+  active: boolean;
   createdAt: string;
 }
 

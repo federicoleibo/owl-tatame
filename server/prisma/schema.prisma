@@ -19,6 +19,9 @@ model User {
   fullName     String
   phone        String?
   role         String    @default("SOCIO")
+  // Membership fee status, toggled manually by an admin (no payment gateway).
+  // Blocks kiosk check-in and shows a payment reminder on login when false.
+  active       Boolean   @default(true)
   createdAt    DateTime  @default(now())
   bookings     Booking[]
   checkIns     CheckIn[]

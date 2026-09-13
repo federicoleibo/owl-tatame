@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { api, ApiError } from "../../api/client";
 import { AdminMember } from "../../api/types";
-import { Button, Card, ErrorText, Input, Label } from "../../components/ui";
+import { Badge, Button, Card, ErrorText, Input, Label } from "../../components/ui";
 import { Modal } from "../../components/Modal";
 
 const emptyForm = { dni: "", fullName: "", phone: "", password: "" };
@@ -49,6 +49,11 @@ export function AdminMembers() {
   async function remove(id: number) {
     if (!window.confirm("¿Eliminar este socio? Se perderan sus reservas.")) return;
     await api(`/admin/members/${id}`, { method: "DELETE" });
+    await load();
+  }
+
+  async function toggleActive(member: AdminMember) {
+    await api(`/admin/members/${member.id}/status`, { method: "PUT", body: { active: !member.active } });
     await load();
   }
 
@@ -149,15 +154,21 @@ export function AdminMembers() {
 
       <div className="space-y-2">
         {filtered.map((m) => (
-          <Card key={m.id} className="flex items-center justify-between gap-4">
+          <Card key={m.id} className="flex items-center justify-between gap-4 flex-wrap">
             <div>
-              <p className="font-semibold">{m.fullName}</p>
+              <p className="font-semibold flex items-center gap-2">
+                {m.fullName}
+                <Badge tone={m.active ? "success" : "danger"}>{m.active ? "Al dia" : "Cuota pendiente"}</Badge>
+              </p>
               <p className="text-sm text-muted">
                 DNI {m.dni}
                 {m.phone ? ` · ${m.phone}` : ""}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
+              <Button variant="secondary" onClick={() => toggleActive(m)}>
+                {m.active ? "Marcar cuota pendiente" : "Marcar cuota al dia"}
+              </Button>
               <Button variant="secondary" onClick={() => openReset(m)}>
                 Restablecer contraseña
               </Button>

@@ -34,7 +34,7 @@ router.post("/register", async (req, res) => {
   const token = signToken({ userId: user.id, role: user.role as "SOCIO" | "ADMIN" });
   res.status(201).json({
     token,
-    user: { id: user.id, dni: user.dni, fullName: user.fullName, role: user.role },
+    user: { id: user.id, dni: user.dni, fullName: user.fullName, role: user.role, active: user.active },
   });
 });
 
@@ -62,14 +62,21 @@ router.post("/login", async (req, res) => {
   const token = signToken({ userId: user.id, role: user.role as "SOCIO" | "ADMIN" });
   res.json({
     token,
-    user: { id: user.id, dni: user.dni, fullName: user.fullName, role: user.role },
+    user: { id: user.id, dni: user.dni, fullName: user.fullName, role: user.role, active: user.active },
   });
 });
 
 router.get("/me", requireAuth, async (req, res) => {
   const user = await prisma.user.findUnique({ where: { id: req.user!.userId } });
   if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
-  res.json({ id: user.id, dni: user.dni, fullName: user.fullName, phone: user.phone, role: user.role });
+  res.json({
+    id: user.id,
+    dni: user.dni,
+    fullName: user.fullName,
+    phone: user.phone,
+    role: user.role,
+    active: user.active,
+  });
 });
 
 export default router;
