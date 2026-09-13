@@ -54,6 +54,25 @@ export function Kiosk() {
     if (dni.length < 9) setDni((d) => d + key);
   }
 
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (result || submitting) return;
+      if (e.key >= "0" && e.key <= "9") {
+        e.preventDefault();
+        press(e.key);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        press("ok");
+      } else if (e.key === "Backspace" || e.key === "Delete") {
+        e.preventDefault();
+        press("borrar");
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dni, result, submitting]);
+
   return (
     <div className="min-h-dvh flex items-center justify-center bg-background px-4 py-8">
       <div className="w-full max-w-md text-center">

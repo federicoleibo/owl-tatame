@@ -154,6 +154,21 @@ router.delete("/members/:id", async (req, res) => {
   res.json({ ok: true });
 });
 
+const resetPasswordSchema = z.object({ password: z.string().min(6) });
+
+router.put("/members/:id/password", async (req, res) => {
+  const parsed = resetPasswordSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "La contrasena debe tener al menos 6 caracteres" });
+
+  const id = Number(req.params.id);
+  const member = await prisma.user.findUnique({ where: { id } });
+  if (!member || member.role !== "SOCIO") return res.status(404).json({ error: "Socio no encontrado" });
+
+  const passwordHash = await bcrypt.hash(parsed.data.password, 10);
+  await prisma.user.update({ where: { id }, data: { passwordHash } });
+  res.json({ ok: true });
+});
+
 // ---- Admin account management ----
 
 router.get("/admins", async (_req, res) => {

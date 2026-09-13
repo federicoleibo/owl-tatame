@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { api, ApiError } from "../../api/client";
 import { AdminMember } from "../../api/types";
 import { Button, Card, ErrorText, Input, Label } from "../../components/ui";
+import { Modal } from "../../components/Modal";
 
 const emptyForm = { dni: "", fullName: "", phone: "", password: "" };
 
@@ -13,6 +14,10 @@ export function AdminMembers() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [query, setQuery] = useState("");
+  const [resetTarget, setResetTarget] = useState<AdminMember | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [resetError, setResetError] = useState("");
+  const [resetting, setResetting] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -45,6 +50,27 @@ export function AdminMembers() {
     if (!window.confirm("¿Eliminar este socio? Se perderan sus reservas.")) return;
     await api(`/admin/members/${id}`, { method: "DELETE" });
     await load();
+  }
+
+  function openReset(member: AdminMember) {
+    setResetTarget(member);
+    setNewPassword("");
+    setResetError("");
+  }
+
+  async function submitReset(e: FormEvent) {
+    e.preventDefault();
+    if (!resetTarget) return;
+    setResetting(true);
+    setResetError("");
+    try {
+      await api(`/admin/members/${resetTarget.id}/password`, { method: "PUT", body: { password: newPassword } });
+      setResetTarget(null);
+    } catch (err) {
+      setResetError(err instanceof ApiError ? err.message : "No se pudo restablecer la contrasena");
+    } finally {
+      setResetting(false);
+    }
   }
 
   const filtered = members.filter(
@@ -131,12 +157,45 @@ export function AdminMembers() {
                 {m.phone ? ` · ${m.phone}` : ""}
               </p>
             </div>
-            <Button variant="danger" onClick={() => remove(m.id)}>
-              Eliminar
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="secondary" onClick={() => openReset(m)}>
+                Restablecer contrasena
+              </Button>
+              <Button variant="danger" onClick={() => remove(m.id)}>
+                Eliminar
+              </Button>
+            </div>
           </Card>
         ))}
       </div>
+
+      {resetTarget && (
+        <Modal title={`Restablecer contrasena de ${resetTarget.fullName}`} onClose={() => setResetTarget(null)}>
+          <form onSubmit={submitReset}>
+            <div className="mb-4">
+              <Label htmlFor="newPassword">Contrasena nueva</Label>
+              <Input
+                id="newPassword"
+                type="text"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Minimo 6 caracteres"
+                autoFocus
+                required
+              />
+            </div>
+            <ErrorText>{resetError}</ErrorText>
+            <div className="flex gap-2">
+              <Button type="submit" disabled={resetting} className="flex-1">
+                {resetting ? "Guardando..." : "Guardar"}
+              </Button>
+              <Button type="button" variant="secondary" onClick={() => setResetTarget(null)} disabled={resetting}>
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 }
